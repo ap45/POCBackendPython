@@ -2,13 +2,15 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
+name: Backend CI/CD
+
 on:
   push:
     branches:
       - main
   workflow_dispatch:
   repository_dispatch:
-    types: [trigger_backend]
+    types: [trigger_backend]  # To listen for the event from frontend
 
 jobs:
   build:
@@ -28,6 +30,34 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      - name: Download frontend artifact
+        run: |
+          # Fetch artifacts
+          ARTIFACTS=$(curl -L -H "Authorization: token ${{ secrets.ACTION_KEY }}" \
+            https://api.github.com/repos/ap45/POCfrontend/actions/artifacts)
+
+          # Check if artifacts were fetched successfully
+          if [ -z "$ARTIFACTS" ]; then
+            echo "No artifacts found or failed to fetch artifacts."
+            exit 1
+          fi
+
+          # Extract the download URL for the frontend build artifact
+          DOWNLOAD_URL=$(echo "$ARTIFACTS" | jq -r '.artifacts[] | select(.name=="frontend-build") | .archive_download_url')
+
+          # Check if the download URL was extracted successfully
+          if [ -z "$DOWNLOAD_URL" ]; then
+            echo "Failed to extract download URL for frontend build artifact."
+            exit 1
+          fi
+
+          # Download the frontend artifact
+          curl -L -H "Authorization: token ${{ secrets.ACTION_KEY }}" -o frontend.zip "$DOWNLOAD_URL"
+
+      - name: Unzip frontend artifact
+        run: |
+          unzip frontend.zip -d frontend
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
@@ -56,20 +86,7 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      # Download frontend artifact from the frontend repository
-      - name: Download frontend build artifact
-        run: |
-          curl -L -H "Authorization: token ${{ secrets.ACTION_KEY }}" \
-          -o frontend-artifact.zip \
-          https://api.github.com/repos/ap45/POCfrontend/actions/artifacts \
-          | jq -r '.artifacts[] | select(.name=="frontend-build") | .archive_download_url' \
-          | xargs curl -L -H "Authorization: token ${{ secrets.ACTION_KEY }}" -o frontend.zip
-
-      - name: Unzip frontend artifact
-        run: |
-          unzip frontend.zip -d frontend
-          
-      - name: 'Deploy to Azure Web App'
+       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
         with:
