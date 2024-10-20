@@ -1,7 +1,8 @@
 from pathlib import Path
 import pymysql
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # Add this import to load .env variables
+pymysql.install_as_MySQLdb()
 
 # Load environment variables from .env file
 load_dotenv()
@@ -9,14 +10,11 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+# Security settings
+SECRET_KEY = os.getenv('SECRET_KEY')  # Fetch the secret key from .env
+DEBUG = os.getenv('DEBUG', 'False') == 'True'  # Set debug based on .env
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
-
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')  # Fetch allowed hosts from .env
 
 # Application definition
 INSTALLED_APPS = [
@@ -62,15 +60,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-# Database configuration
+# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME', 'uncwpoc'),
-        'USER': os.getenv('DB_USER', 'admin'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'uncwtest12345'),
-        'HOST': os.getenv('DB_HOST', 'uncwtestdb1.cx26meucargn.us-east-2.rds.amazonaws.com'),
-        'PORT': os.getenv('DB_PORT', '3306'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 
@@ -104,4 +102,5 @@ STATICFILES_DIRS = [
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-CORS_ORIGIN_ALLOW_ALL = True  
+
+CORS_ORIGIN_ALLOW_ALL = True
