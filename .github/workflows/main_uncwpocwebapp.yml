@@ -29,30 +29,37 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Download frontend artifact
+      - name: Download latest frontend artifact
         run: |
           # Fetch artifacts
           ARTIFACTS=$(curl -L -H "Authorization: token ${{ secrets.ACTION_KEY }}" \
             https://api.github.com/repos/ap45/POCfrontend/actions/artifacts)
-
+      
           # Check if artifacts were fetched successfully
           if [ -z "$ARTIFACTS" ]; then
             echo "No artifacts found or failed to fetch artifacts."
             exit 1
           fi
-
-          # Extract the download URL for the frontend build artifact
-          DOWNLOAD_URL=$(echo "$ARTIFACTS" | jq -r '.artifacts[] | select(.name=="frontend-build") | .archive_download_url')
-
+      
+          # Extract the latest artifact based on created_at timestamp
+          LATEST_ARTIFACT=$(echo "$ARTIFACTS" | jq -r '.artifacts | max_by(.created_at)')
+      
+          # Extract the download URL for the latest artifact
+          DOWNLOAD_URL=$(echo "$LATEST_ARTIFACT" | jq -r '.archive_download_url')
+      
           # Check if the download URL was extracted successfully
           if [ -z "$DOWNLOAD_URL" ]; then
-            echo "Failed to extract download URL for frontend build artifact."
+            echo "Failed to extract download URL for the latest frontend build artifact."
             exit 1
           fi
-
-          # Download the frontend artifact
+      
+          # Download the latest frontend artifact
           curl -L -H "Authorization: token ${{ secrets.ACTION_KEY }}" -o frontend.zip "$DOWNLOAD_URL"
-
+      
+          # Optional: Unzip the artifact if needed
+          # unzip frontend.zip -d ./frontend
+      
+           
       - name: Unzip frontend artifact
         run: |
           unzip frontend.zip -d frontend
