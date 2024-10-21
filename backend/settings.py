@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')  # Fetch the secret key from .env
 DEBUG = os.getenv('DEBUG', 'False') == 'True'  # Set debug based on .env
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')  # Fetch allowed hosts from .env
+ALLOWED_HOSTS = ["*"]  # Fetch allowed hosts from .env
 
 # Application definition
 INSTALLED_APPS = [
