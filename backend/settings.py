@@ -2,6 +2,7 @@ from pathlib import Path
 import pymysql
 import os
 from dotenv import load_dotenv  # Add this import to load .env variables
+
 pymysql.install_as_MySQLdb()
 
 # Load environment variables from .env file
