@@ -15,8 +15,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.http import HttpResponse
+from django.views.generic import TemplateView
+from django.conf import settings
+from django.conf.urls.static import static
+
+
 
 
 # urlpatterns = [
@@ -26,6 +31,12 @@ from django.http import HttpResponse
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('student_course.urls')),
-    path('', lambda request: HttpResponse("Welcome to the Student Course API!")),  # Optional homepage
+    #path('', lambda request: HttpResponse("Welcome to the Student Course API!")),  # Optional homepage
 
 ]
+
+urlpatterns += [re_path(r'^.*$', TemplateView.as_view(template_name='index.html'))]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
+

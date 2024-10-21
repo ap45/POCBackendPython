@@ -10,3 +10,4 @@ venv/
 *.log
 *.sqlite3
 /media
+/dist

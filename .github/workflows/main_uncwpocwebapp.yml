@@ -65,7 +65,7 @@ jobs:
            
       - name: Unzip frontend artifact
         run: |
-          unzip frontend.zip -d frontend
+          unzip frontend.zip -d dist
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r

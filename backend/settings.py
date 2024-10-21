@@ -47,8 +47,11 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        
+        'DIRS': [
+            os.path.join(BASE_DIR, 'dist')  # Add this line to point to the dist folder
+        ],
+        'APP_DIRS': False,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -99,7 +102,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+     os.path.join(BASE_DIR, 'dist'),
+     os.path.join(BASE_DIR, 'static'),
+   
 ]
 
 
