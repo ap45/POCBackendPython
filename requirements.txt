@@ -4,3 +4,5 @@ mysqlclient==2.2.4
 django-cors-headers==4.5.0
 gunicorn==20.1.0
 python-dotenv
+whitenoise
+pymysql
